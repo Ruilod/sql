@@ -51,18 +51,13 @@ DESC video_likes;
 desc videos;
 
 -- Обновляем vid likes
-UPDATE videos SET likes_count = SELECT 
-  (SELECT COUNT(*) FROM video_likes WHERE target_id = videos.id AND is_like=1) AS total
-  FROM videos;
- UPDATE videos SET dislikes_count = FLOOR(RAND() * 100);
+UPDATE videos, v SET dislikes_count = likes where videos.id = v.id;
 
-SELECT COUNT(*) FROM video_likes WHERE is_like=1 AND;
-SELECT id from videos;
+create or replace view v as select videos.id, count(distinct video_likes.id) as likes
+	from videos left join video_likes on videos.id = video_likes.target_id
+	where not is_like
+	group by videos.id;
 
-SELECT 
-  (SELECT COUNT(*) FROM video_likes WHERE target_id = videos.id AND is_like=1) AS total
-  FROM videos;
- SELECT COUNT(*) FROM video_likes WHERE target_id = videos.id AND is_like=1;
 
 -- Заполняем metadata
 UPDATE videos SET metadata = CONCAT('{"owner":"', 
@@ -74,8 +69,10 @@ ALTER TABLE videos ADD COLUMN metadata JSON after tags;
 
 UPDATE follows SET follower_id = follower_id + 1 WHERE user_id = follower_id;
 
-
-
+CREATE INDEX users_email_idx ON users(email);
+CREATE INDEX users_phone_idx ON users(phone);
+CREATE INDEX videos_name_idx ON videos(video_name);
+CREATE INDEX videos_tags_idx ON videos(tags);
 
 
   

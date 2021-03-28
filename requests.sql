@@ -39,6 +39,7 @@ SELECT * from activity_top;
 create view top_videos AS (select videos.id, count(distinct views.id) as Views
 	from videos left join views on videos.id = views.target_id
 	group by videos.id order by Views DESC);
+SELECT * from top_videos;
 		
 
 
